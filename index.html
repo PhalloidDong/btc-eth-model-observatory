@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="BTC / ETH 模型历史回测摘要：按时间窗口比较收益、回撤与成交笔数。">
+  <title>Model Observatory · BTC / ETH</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 用途：展示经过摘要生成器筛选的公开回测指标。输入在 data/results.js；
+       本页不加载研究源码、逐笔信号或账户信息。语言和时期由 app.js 控制。 -->
+  <main class="shell">
+    <header class="masthead">
+      <div class="brand">Model Observatory</div>
+      <nav id="language-switch" class="language-switch" aria-label="Language / 语言">
+        <button type="button" data-lang="zh" aria-pressed="true">中文</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-layout">
+        <h1 class="hero-title" id="hero-title">收益。<span class="accent">风险。</span><br>看得更清楚。</h1>
+        <p class="hero-meta" id="hero-meta">BTC / ETH</p>
+      </div>
+    </section>
+
+    <!-- 主观察模型固定为 M1；展示值随窗口切换，不把历史判断描述成未来收益。 -->
+    <section class="spotlight" aria-labelledby="feature-heading">
+      <div class="spotlight-main">
+        <div class="spotlight-id" id="feature-id">01 / M1</div>
+        <h2 id="feature-heading">当前研究重点</h2>
+        <p class="spotlight-copy" id="feature-copy"></p>
+      </div>
+      <div class="spotlight-metric">
+        <div class="metric-label" id="feature-net-label">账户净利润</div>
+        <div class="metric-value" id="feature-net">—</div>
+      </div>
+      <div class="spotlight-metric">
+        <div class="metric-label" id="feature-mdd-label">最大回撤</div>
+        <div class="metric-value" id="feature-mdd">—</div>
+      </div>
+    </section>
+
+    <!-- 每个条形图只比较同一回测窗口的账户净利润，四条共用零点和比例尺。
+         缺失回测保持空值，不能用其他窗口或开发期数字填补。 -->
+    <section class="comparison" aria-labelledby="section-label">
+      <div class="section-head">
+        <h2 id="section-label">四个模型 · 同期比较</h2>
+        <nav class="period-switch" id="period-switch" aria-label="回测窗口 / Backtest period">
+          <button type="button" data-period="近五年" aria-pressed="false">近五年</button>
+          <button type="button" data-period="近三年" aria-pressed="false">近三年</button>
+          <button type="button" data-period="近一年" aria-pressed="false">近一年</button>
+          <button type="button" data-period="近三个月" aria-pressed="true">近三个月</button>
+        </nav>
+      </div>
+      <ol class="model-list" id="model-list" aria-live="polite"></ol>
+    </section>
+
+    <footer class="footer" id="footer-copy"></footer>
+  </main>
+  <script src="data/results.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
