@@ -1,0 +1,283 @@
+/* ============================================================
+   样式设计：策略监控页（第二版）
+   输入：主 Agent 生成的语义 HTML（body/.shell/.masthead/…）
+   输出：深黑底 #080c10 + 蓝 #457692 + 克制黄 #d8b83f 的版面
+   假设：无卡片、无网格、无背景图；bar 宽度由 JS 内联设置
+   ============================================================ */
+
+/* 字体：优先本地 Novecento Wide（标题用），正文 Helvetica，均退到 Arial */
+@font-face {
+  font-family: "Novecento";
+  src: local("Novecento Wide Normal"), local("Novecento Wide Bold");
+  font-weight: 400 700;
+}
+@font-face {
+  font-family: "HelveticaLocal";
+  src: local("Helvetica"), local("Helvetica Neue");
+}
+
+/* 全局：重置盒模型，保证 375px 下不横向溢出 */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { max-width: 100%; overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: #080c10;                    /* 深黑底 */
+  color: #c8d4dc;                          /* 正文浅灰蓝，对比度 ≥ 4.5:1 */
+  font-family: "HelveticaLocal", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 页面容器：桌面限宽居中，手机满宽，四周大留白 */
+.shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 48px 32px 72px;
+}
+
+/* 顶栏：品牌 + 语言切换，底部细线分割 */
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #1b2530;        /* 细分割线（低饱和蓝灰） */
+}
+.brand {
+  font-family: "Novecento", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #457692;                          /* 主蓝 */
+}
+
+/* 主标题：两行大写 Novecento，大字号 + 强留白 */
+.hero { padding: 72px 0 48px; }
+.hero-title {
+  margin: 0;
+  font-family: "Novecento", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.14;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #e9eff3;                          /* 近白，最高可读性 */
+}
+.hero-title .accent { color: #d8b83f; }    /* 克制黄：仅点缀关键词 */
+.hero-meta {
+  margin-top: 24px;
+  max-width: 46ch;
+  color: #7f93a1;                          /* 次级文本，仍可读 */
+}
+
+/* 焦点策略区：无卡片，仅细线顶部分割，横向排版 */
+.spotlight {
+  padding: 32px 0;
+  border-top: 1px solid #1b2530;
+}
+.spotlight-id {
+  font-family: "Novecento", Arial, sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: #d8b83f;
+}
+.spotlight-copy { max-width: 52ch; margin: 8px 0 0; color: #a9bac6; }
+.spotlight-metric {
+  font-size: 34px;
+  color: #e9eff3;
+  margin-top: 16px;
+}
+
+/* 区块标题行：左标题右周期切换 */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 64px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #1b2530;
+  font-family: "Novecento", Arial, sans-serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #7f93a1;
+}
+
+/* 策略列表：每行一个 bar，无卡片背景 */
+.model-list { margin: 0; padding: 0; list-style: none; }
+.model-row {
+  padding: 22px 0;
+  border-bottom: 1px solid #131c25;        /* 行间更细的分割线 */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.model-row:hover { background: #0c1218; }
+.model-row.is-selected .model-id { color: #d8b83f; }
+
+/* 行头部：ID + 净值并排 */
+.row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.model-id {
+  font-family: "Novecento", Arial, sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #c8d4dc;
+}
+.row-net { font-size: 15px; color: #e9eff3; }
+
+/* bar：极细轨道 + 蓝色填充；宽度由 JS 内联控制，此处不写死 */
+.bar-track {
+  margin-top: 12px;
+  height: 4px;
+  width: 100%;
+  background: #16202a;                     /* 轨道：比底色略亮 */
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: #457692;                     /* 主蓝填充 */
+  border-radius: 2px;
+  transition: width 0.6s ease;             /* JS 换宽度时的平滑动画 */
+}
+
+/* 行元信息与展开详情 */
+.row-meta { margin-top: 8px; font-size: 12.5px; color: #7f93a1; }
+.row-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #1b2530;
+  font-size: 13.5px;
+  color: #a9bac6;
+}
+
+/* 按钮（周期/语言切换）：透明底细边框，hover 黄、focus-visible 外圈 */
+button {
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8d4dc;
+  background: transparent;
+  border: 1px solid #2b3a47;
+  border-radius: 2px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.period-switch { display: flex; gap: 8px; flex-wrap: wrap; }
+button:hover { border-color: #d8b83f; color: #d8b83f; }
+button:focus-visible {
+  outline: 2px solid #d8b83f;              /* 键盘焦点高亮，对比清晰 */
+  outline-offset: 2px;
+}
+
+/* 页脚：顶部细线，弱化排版 */
+.footer {
+  margin-top: 80px;
+  padding-top: 20px;
+  border-top: 1px solid #1b2530;
+  font-size: 12px;
+  color: #5b6c79;
+}
+
+/* 手机（≤375px）：收窄留白，标题降档，防溢出 */
+@media (max-width: 480px) {
+  .shell { padding: 28px 18px 56px; }
+  .hero { padding: 44px 0 32px; }
+  .spotlight-metric { font-size: 28px; }
+  .section-head { margin-top: 44px; }
+  .row-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+/* 无障碍：尊重减少动态偏好，关闭过渡动画 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 设计稿落地调整：本机装有 Novecento 与 Helvetica；分别声明字重，
+   让浏览器按真实字体名称查找，找不到时才使用 Arial。页面不复制字体文件。 */
+@font-face { font-family: "Novecento Display"; src: local("Novecento Wide Normal"), local("Novecento-wide-Normal-2"); font-weight: 400; }
+@font-face { font-family: "Novecento Display"; src: local("Novecento Wide Bold"), local("Novecento-Wide-Bold-2"); font-weight: 700; }
+@font-face { font-family: "Helvetica Text"; src: local("Helvetica"), local("Helvetica Neue"); font-weight: 400; }
+@font-face { font-family: "Helvetica Text"; src: local("Helvetica Bold"), local("Helvetica-Bold"); font-weight: 700; }
+body { background: #080c10; color: #dce6eb; font-family: "Helvetica Text", Helvetica, Arial, sans-serif; }
+.shell { max-width: 1480px; padding: 34px 48px 56px; }
+.masthead { padding-bottom: 16px; }
+.brand, .hero-title, .spotlight-id, .spotlight h2, .section-head, .model-id, .metric-label {
+  font-family: "Novecento Display", Arial, sans-serif;
+}
+.brand { color: #dce6eb; }
+.language-switch { display: flex; align-items: center; gap: 8px; }
+.language-switch button { border: 0; padding: 4px; color: #9baebb; }
+.language-switch button.is-active { color: #d8b83f; }
+
+/* 上方按设计稿保留宽阔留白；蓝色强调风险，黄色只强调 M1。 */
+.hero { padding: 40px 0 30px; }
+.hero-layout { display: flex; align-items: end; justify-content: space-between; gap: 32px; }
+.hero-title { font-size: clamp(44px, 6.6vw, 96px); line-height: 1.04; letter-spacing: -.02em; font-weight: 700; }
+.hero-title .accent { color: #69a8c8; }
+.hero-meta { margin: 0 0 7px; max-width: 34ch; min-width: 280px; color: #a7bac5; white-space: pre-line; }
+.spotlight { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(180px, .75fr) minmax(180px, .75fr); align-items: end; gap: 32px; padding: 24px 0 28px; }
+.spotlight-main { min-width: 0; }
+.spotlight-id { font-size: clamp(32px, 4vw, 62px); letter-spacing: .04em; }
+.spotlight h2 { margin: 4px 0 0; font-size: clamp(20px, 2.3vw, 30px); font-weight: 400; line-height: 1.3; text-transform: uppercase; color: #e9eff3; }
+.spotlight-copy { max-width: 52ch; margin: 8px 0 0; }
+.spotlight-metric { min-width: 0; padding-left: 24px; border-left: 1px solid #2b3a47; margin-top: 0; }
+.metric-label { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #a7bac5; }
+.metric-value { margin-top: 8px; font-size: clamp(30px, 3.4vw, 54px); line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; color: #e9eff3; }
+.spotlight-metric:nth-child(2) .metric-value { color: #d8b83f; }
+.section-head { margin-top: 18px; color: #a7bac5; }
+.section-head h2 { margin: 0; font: inherit; }
+
+/* 每行共用左端零点和同一长度尺度；数值从摘要读取，CSS 不写死比例。 */
+.model-row summary { cursor: pointer; list-style: none; }
+.model-row { padding: 16px 0; }
+.model-row summary::-webkit-details-marker { display: none; }
+.model-row summary:focus-visible { outline: 2px solid #d8b83f; outline-offset: 6px; }
+.model-row.is-selected .row-net, .model-row.is-selected .model-id { color: #d8b83f; }
+.row-head { display: grid; grid-template-columns: 80px minmax(100px, 1fr) minmax(150px, .32fr) minmax(200px, .36fr); align-items: center; gap: 22px; }
+.row-net { grid-column: 3; grid-row: 1; font-size: clamp(19px, 2.1vw, 31px); font-variant-numeric: tabular-nums; white-space: nowrap; color: #69a8c8; }
+.bar-track { grid-column: 2; grid-row: 1; margin-top: 0; }
+.bar-track.is-missing { visibility: hidden; }
+.row-meta { grid-column: 4; grid-row: 1; margin-top: 0; font-size: 12.5px; color: #a7bac5; text-align: right; white-space: pre-line; }
+button.is-active { color: #d8b83f; border-color: #d8b83f; }
+.period-switch button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 5px 3px; }
+.period-switch button.is-active { border-bottom-color: #d8b83f; }
+.footer { margin-top: 50px; color: #99aebb; }
+
+/* 小屏改为上下排布；条形图和数值仍在同一行，避免横向滚动。 */
+@media (max-width: 940px) {
+  .hero-layout { align-items: start; flex-direction: column; }
+  .spotlight { grid-template-columns: 1fr 1fr; }
+  .spotlight-main { grid-column: 1 / -1; }
+  .row-head { grid-template-columns: 65px minmax(100px, 1fr) minmax(130px, .4fr); }
+  .row-meta { grid-column: 2 / -1; grid-row: 2; text-align: left; }
+}
+@media (max-width: 480px) {
+  .shell { padding: 28px 18px 56px; }
+  .hero-title { font-size: clamp(34px, 9.6vw, 48px); }
+  .hero-meta { min-width: 0; }
+  .spotlight { grid-template-columns: 1fr 1fr; gap: 22px 10px; }
+  .spotlight-metric { padding-left: 12px; }
+  .metric-value { font-size: clamp(23px, 7vw, 32px); }
+  .section-head { margin-top: 44px; }
+  .row-head { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; }
+  .row-meta { grid-column: 1 / -1; grid-row: 3; text-align: left; }
+  .bar-track { grid-column: 1 / -1; grid-row: 2; }
+  .row-net { grid-column: 3; grid-row: 1; font-size: 18px; }
+}
